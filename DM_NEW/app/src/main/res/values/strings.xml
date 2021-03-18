@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">DONKEY</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="textViewStatus">Click on Start button to start service...</string>
+    <string name="radio_btn_ordered_delivery">Ordered Delivery</string>
+    <string name="radio_btn_unordered_delivery">Unordered Delivery</string>
+
+    <string name="radio_btn_msg_type_0">Atmost Once (T0)</string>
+    <string name="radio_btn_msg_type_1">Exactly Once (T1)</string>
+    <string name="radio_btn_msg_type_2">Atleast Once (T3)</string>
+
+    <string-array name="server_ips">
+        <item></item>
+        <item>http://128.195.52.69:8080</item>
+        <item>http://128.195.52.137:8080</item>
+    </string-array>
+
+</resources>
