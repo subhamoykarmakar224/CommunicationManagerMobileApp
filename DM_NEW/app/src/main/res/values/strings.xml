@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DONKEY</string>
+    <string name="app_name">DM Comm Manager</string>
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>
     <string name="textViewStatus">Click on Start button to start service...</string>
