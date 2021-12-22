@@ -1,7 +1,6 @@
-package com.example.dm.services;
+package com.subhamoy.datamule.datamule.helper;
 
 public class Constants {
-
     public static final String TAG_LOG = "datamule";
     public static final String TAG_REQUEST = "dm_nw_request";
 
@@ -12,14 +11,14 @@ public class Constants {
     // Notification channel ID
     public static final String NOTIFICATION_CHANNEL_ID = "ForegroundServiceChannelDataMule";
 
-    // ForegroundServce.java
+    // ForegroundService.java
     public static final String FOREGROUND_SERVICE_CHANNEL_ID = "foregroundservicechannel";
 
     // TIPPERS APIs
     public static final String API_CHECK_CONNECTION = "/observationhandler/observations/testconnection";
     public static final String API_ADD_DATA = "/observationhandler/observations/add";
 
-//    http://128.195.52.69:8080/add/data
+    //    http://128.195.52.69:8080/add/data
     public static final String TEST_API_CHECK_CONNECTION = "/testconnection";
     public static final String TEST_API_ADD_DATA = "/add/data";
     public static final String TEST_API_ADD_DATA_LIST = "/add/datalist";
