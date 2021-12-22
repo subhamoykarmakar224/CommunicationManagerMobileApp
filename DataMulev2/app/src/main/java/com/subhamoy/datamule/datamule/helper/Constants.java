@@ -1,5 +1,7 @@
 package com.subhamoy.datamule.datamule.helper;
 
+import android.Manifest;
+
 public class Constants {
     public static final String TAG_LOG = "datamule";
     public static final String TAG_REQUEST = "dm_nw_request";
@@ -22,4 +24,16 @@ public class Constants {
     public static final String TEST_API_CHECK_CONNECTION = "/testconnection";
     public static final String TEST_API_ADD_DATA = "/add/data";
     public static final String TEST_API_ADD_DATA_LIST = "/add/datalist";
+
+    // PERMISSIONS
+    public static int REQUEST_CODE = 11023;
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
 }

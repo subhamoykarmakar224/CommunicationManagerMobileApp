@@ -1,7 +1,6 @@
 package com.example.dm.services;
 
 public class Constants {
-
     public static final String TAG_LOG = "datamule";
     public static final String TAG_REQUEST = "dm_nw_request";
 
