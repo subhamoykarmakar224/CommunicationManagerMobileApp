@@ -1,0 +1,21 @@
+{
+  "name": "commmanagerbackend",
+  "version": "1.0.0",
+  "description": "Backend for data sensor data collection.",
+  "main": "server.js",
+  "scripts": {
+    "dev":"nodemon server.js"
+  },
+  "author": "Subhamoy Karmakar",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

@@ -30,6 +30,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    private static String LOG_MAINACTIVITY = "LOG::MainActivity";
+    private static int REQUEST_CODE = 11023;
+
     public static final int DEFAULT_UPDATE_INTERVAL = 5;
     public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
@@ -79,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         if(fusedLocationProviderClient == null) {
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         }
-
         // Switch Listener
         switchUsePowerSaver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
     } // End of onCreate method
 
     @SuppressLint("MissingPermission")
@@ -185,4 +188,5 @@ public class MainActivity extends AppCompatActivity {
             textViewApproxAddress.setText("-error-");
         }
     }
+
 }

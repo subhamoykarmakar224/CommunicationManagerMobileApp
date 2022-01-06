@@ -330,29 +330,4 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mBroadcaseReceiver2Discoverability);
         bluetoothAdapter = null;
     }
-
-//    /**
-//     * TODO :: Delete
-//     */
-//    private void bleScanDemoExample() {
-//        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//        Log.i(Constants.TAG_LOG, "INITIALIZE SCAN...");
-//        BluetoothAdapter.LeScanCallback scanCallback = new BluetoothAdapter.LeScanCallback() {
-//            @Override
-//            public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-//                Log.i(Constants.TAG_LOG, "START SCAN");
-//                    Log.i(Constants.TAG_LOG, "-----------------------------------------------------------------");
-//                    Log.i(Constants.TAG_LOG, "found " + device.getName() + " - " + device.toString() + " rssi:" + rssi);
-//                    Log.i(Constants.TAG_LOG, "PACKET: \n" + scanRecord.toString());
-//                    Log.i(Constants.TAG_LOG, "-----------------------------------------------------------------");
-//            }
-//        };
-//
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                bluetoothAdapter.startLeScan(scanCallback);
-//            }
-//        }, 10000);
-//    }
 }
