@@ -31,4 +31,8 @@ public class Constants {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
 
+    // Shared Preference Keys
+    public static final String KEY_SP_LATITUDE = "latitude";
+    public static final String KEY_SP_LONGITUDE = "longitude";
+
 }

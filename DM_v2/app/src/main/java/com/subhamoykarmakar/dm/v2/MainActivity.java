@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocation;
 
 import java.util.List;
 
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     LocationRequest locationRequest;
     LocationCallback locationCallback;
 
+    // Shared Preference Data Access
+    SPUpdateLocation spUpdateLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         textViewSensorUsedStatus = findViewById(R.id.textViewSensorUsedStatus);
         textViewAccuracy = findViewById(R.id.textViewAccuracy);
         textViewApproxAddress = findViewById(R.id.textViewApproxAddress);
+
+        spUpdateLocation = new SPUpdateLocation(this);
     }
 
     private void initLocationListeners() {
@@ -83,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
                 // Save the location
                 Location location = locationResult.getLastLocation();
+
+                // Update SharedPreference data
+                spUpdateLocation.updateLatLong(
+                        String.valueOf(location.getLatitude()),
+                        String.valueOf(location.getLongitude())
+                );
+
+                // Update UI
                 updateUIValues(location);
             }
         };
@@ -132,23 +146,8 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case PERMISSIONS_FINE_LOCATION:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    updateGPS();
-                } else {
-                    Toast.makeText(this, "This app requires permission to be granted in order to work properly.", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                break;
-        }
-    }
-
     private void updateGPS() {
+
         // Get permissions from user to track GPS
         // Get the current location from the fused client
         // Update UI
@@ -194,4 +193,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initBluetoothListener() {
+        
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_FINE_LOCATION:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    updateGPS();
+                } else {
+                    Toast.makeText(this, "This app requires permission to be granted in order to work properly.", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
