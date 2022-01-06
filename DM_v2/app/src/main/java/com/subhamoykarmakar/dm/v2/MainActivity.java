@@ -13,7 +13,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.LocaleList;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -54,19 +53,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initWidgets();
+
+        initLocationListeners();
+
+    } // End of onCreate method
+
+    private void initWidgets() {
         btnStartStop = findViewById(R.id.btnStartStop);
         textViewLatLong = findViewById(R.id.textViewLatLong);
         switchUsePowerSaver = findViewById(R.id.switchUsePowerSaver);
         textViewSensorUsedStatus = findViewById(R.id.textViewSensorUsedStatus);
         textViewAccuracy = findViewById(R.id.textViewAccuracy);
         textViewApproxAddress = findViewById(R.id.textViewApproxAddress);
+    }
 
+    private void initLocationListeners() {
         // Init Location services
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
 
         // Event triggered whenever the update interval is met
         locationCallback = new LocationCallback() {
@@ -106,12 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 } else if (tmpS.equalsIgnoreCase("stop")) {
                     // Turn Off location tracking
                     stopLocationUpdate();
-
                 }
             }
         });
-
-    } // End of onCreate method
+    }
 
     @SuppressLint("MissingPermission")
     private void startLocationUpdate() {
