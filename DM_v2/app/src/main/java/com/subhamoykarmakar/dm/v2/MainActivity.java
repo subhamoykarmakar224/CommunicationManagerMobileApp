@@ -4,15 +4,25 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,7 +34,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.subhamoykarmakar.dm.v2.services.ForegroundService;
 import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocation;
+import com.subhamoykarmakar.dm.v2.utils.Constants;
 
 import java.util.List;
 
@@ -52,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
     // Shared Preference Data Access
     SPUpdateLocation spUpdateLocation;
 
+    // Bluetooth Service
+    BluetoothAdapter bluetoothAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         initWidgets();
 
         initLocationListeners();
+
+        bluetoothModulesInit();
 
     } // End of onCreate method
 
@@ -73,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
 
         spUpdateLocation = new SPUpdateLocation(this);
     }
+
+    /**
+     * LOCATION MODULE
+     */
 
     private void initLocationListeners() {
         // Init Location services
@@ -89,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Save the location
                 Location location = locationResult.getLastLocation();
+
+                Log.i(LOG_MAINACTIVITY, "Location :: " + location.getLatitude() + ", " + location.getLongitude());
 
                 // Update SharedPreference data
                 spUpdateLocation.updateLatLong(
@@ -136,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationUpdate() {
         btnStartStop.setText("Stop");
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+        startForegroundService();
     }
 
     private void stopLocationUpdate() {
@@ -144,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         textViewAccuracy.setText("Accuracy: -na-");
         textViewApproxAddress.setText("Address: -na-");
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        stopForegroundService();
     }
 
     private void updateGPS() {
@@ -193,28 +218,98 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initBluetoothListener() {
-        
+    /**
+     * BLUETOOTH MODULE
+     */
+    // Create a BroadcastReceiver for discoverability mode on/off or expire.
+    private final BroadcastReceiver mBroadcaseReceiver2Discoverability = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (action.equals(bluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, bluetoothAdapter.ERROR);
+                switch (mode) {
+                    case BluetoothAdapter.SCAN_MODE_NONE:
+                        if (isMyServiceRunning(ForegroundService.class)) {
+                            Intent intentService = new Intent(context, ForegroundService.class);
+                            stopService(intentService);
+                            stopLocationUpdate();
+                        }
+                        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                        alertDialog.setTitle("Error");
+                        alertDialog.setMessage("You will need Bluetooth to use this app. Please switch on bluetooth to continue.");
+                        alertDialog.show();
+                        break;
+                }
+            }
+        }
+    };
+
+    private void bluetoothModulesInit() {
+        IntentFilter intentFilter = new IntentFilter(bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        registerReceiver(mBroadcaseReceiver2Discoverability, intentFilter);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+            bluetoothAdapter = ((BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+        } else {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    private void startForegroundService() {
+        Intent intentService = new Intent(MainActivity.this, ForegroundService.class);
+        ContextCompat.startForegroundService(MainActivity.this, intentService);
+    }
 
-        switch (requestCode) {
-            case PERMISSIONS_FINE_LOCATION:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    updateGPS();
-                } else {
-                    Toast.makeText(this, "This app requires permission to be granted in order to work properly.", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                break;
+    private void stopForegroundService() {
+        if (isMyServiceRunning(ForegroundService.class)) {
+            Intent intentService = new Intent(this, ForegroundService.class);
+            stopService(intentService);
         }
+    }
+
+
+    /**
+     * Checks if the service is still running in the background
+     *
+     * @param serviceClass
+     * @return
+     */
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks Runtime permission for the application
+     */
+    private void checkRuntimePermissions() {
+        ActivityCompat.requestPermissions(MainActivity.this, Constants.PERMISSIONS, REQUEST_CODE);
+        for (String p : Constants.PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, p) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        MainActivity.this,
+                        new String[]{p},
+                        REQUEST_CODE);
+            }
+        }
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdate();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopLocationUpdate();
+        unregisterReceiver(mBroadcaseReceiver2Discoverability);
     }
 }

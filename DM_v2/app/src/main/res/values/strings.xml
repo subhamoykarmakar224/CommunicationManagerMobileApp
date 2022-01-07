@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">DMv2</string>
+    <string-array name="server_ips">
+        <item>http://127.0.0.1:8001</item>
+        <item>http://128.195.52.69:8080</item>
+        <item>http://128.195.52.137:8080</item>
+    </string-array>
 </resources>

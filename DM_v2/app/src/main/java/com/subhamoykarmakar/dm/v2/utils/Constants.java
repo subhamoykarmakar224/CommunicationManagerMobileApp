@@ -19,7 +19,7 @@ public class Constants {
             KEY_CURR_IDENTIFIER + " int)";
 
     // Notification channel ID
-    public static final String NOTIFICATION_CHANNEL_ID = "ForegroundServiceChannelDataMule";
+    public static final String NOTIFICATION_CHANNEL_ID = "DataMuleNotification";
 
     public static final String[] PERMISSIONS = {
             Manifest.permission.FOREGROUND_SERVICE,
