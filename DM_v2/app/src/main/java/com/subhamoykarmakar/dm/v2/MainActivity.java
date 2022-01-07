@@ -22,11 +22,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -35,7 +33,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.subhamoykarmakar.dm.v2.services.ForegroundService;
-import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocation;
+import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocationController;
 import com.subhamoykarmakar.dm.v2.utils.Constants;
 
 import java.util.List;
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     LocationCallback locationCallback;
 
     // Shared Preference Data Access
-    SPUpdateLocation spUpdateLocation;
+    SPUpdateLocationController spUpdateLocationController;
 
     // Bluetooth Service
     BluetoothAdapter bluetoothAdapter;
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         initLocationListeners();
 
-        bluetoothModulesInit();
+        bluetoothModulesBroadcastRecevierInit();
 
     } // End of onCreate method
 
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         textViewAccuracy = findViewById(R.id.textViewAccuracy);
         textViewApproxAddress = findViewById(R.id.textViewApproxAddress);
 
-        spUpdateLocation = new SPUpdateLocation(this);
+        spUpdateLocationController = new SPUpdateLocationController(this);
     }
 
     /**
@@ -111,10 +109,8 @@ public class MainActivity extends AppCompatActivity {
                 // Save the location
                 Location location = locationResult.getLastLocation();
 
-                Log.i(LOG_MAINACTIVITY, "Location :: " + location.getLatitude() + ", " + location.getLongitude());
-
                 // Update SharedPreference data
-                spUpdateLocation.updateLatLong(
+                spUpdateLocationController.updateLatLong(
                         String.valueOf(location.getLatitude()),
                         String.valueOf(location.getLongitude())
                 );
@@ -245,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void bluetoothModulesInit() {
+    private void bluetoothModulesBroadcastRecevierInit() {
         IntentFilter intentFilter = new IntentFilter(bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         registerReceiver(mBroadcaseReceiver2Discoverability, intentFilter);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {

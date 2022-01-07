@@ -4,10 +4,10 @@ import android.content.Context;
 
 import com.subhamoykarmakar.dm.v2.utils.Constants;
 
-public class SPUpdateLocation {
+public class SPUpdateLocationController {
     private SharedPrefController sharedPrefController;
 
-    public SPUpdateLocation(Context context) {
+    public SPUpdateLocationController(Context context) {
         sharedPrefController = SharedPrefController.getInstance(context);
     }
 
