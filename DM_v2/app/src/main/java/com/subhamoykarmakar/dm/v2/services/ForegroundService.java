@@ -153,6 +153,7 @@ public class ForegroundService extends Service {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
+// Uncomment if you want address.
 //    private String getApproxAddress(Location location) {
 //        Geocoder geocoder = new Geocoder(context);
 //        String address = "";
