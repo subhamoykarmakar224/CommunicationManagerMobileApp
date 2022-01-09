@@ -1,23 +1,19 @@
 package com.subhamoykarmakar.dm.v2.services;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -26,14 +22,11 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.subhamoykarmakar.dm.v2.MainActivity;
 import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocationController;
 import com.subhamoykarmakar.dm.v2.utils.Constants;
 
-import java.util.concurrent.Executor;
+import java.util.List;
 
 public class ForegroundService extends Service {
     private static String LOG_FOREGROUND = "LOG::ForegroundService";
@@ -42,7 +35,8 @@ public class ForegroundService extends Service {
             ACTION_LOCATION_BROADCAST = ForegroundService.class.getName() + "LocationBroadcast",
             EXTRA_LATITUDE = "extra_latitude",
             EXTRA_LONGITUDE = "extra_longitude",
-            EXTRA_ACCURACY = "extra_accuracy";
+            EXTRA_ACCURACY = "extra_accuracy",
+            EXTRA_ADDRESS = "extra_address";
 
     // Shared Preference Data Access
     SPUpdateLocationController spUpdateLocationController;
@@ -64,12 +58,13 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        spUpdateLocationController = new SPUpdateLocationController(this);
-        context = getApplicationContext();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        spUpdateLocationController = new SPUpdateLocationController(this);
+        context = getApplicationContext();
+
         registerNotification();
 
         initLocationListeners();
@@ -82,29 +77,6 @@ public class ForegroundService extends Service {
     @SuppressLint("MissingPermission")
     private void startLocationService() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(
-                new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            Location location = task.getResult();
-                            Log.i(LOG_FOREGROUND, "LOCATION :: " + location.getLatitude() + " , " + location.getLongitude());
-                            sendBroadcastMessage(location);
-                        } else {
-                            Log.i(LOG_FOREGROUND, "Failed to get location.");
-                        }
-                    }
-                });
-    }
-
-    private void sendBroadcastMessage(Location location) {
-        if (location != null) {
-            Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
-            intent.putExtra(EXTRA_LATITUDE, location.getLatitude());
-            intent.putExtra(EXTRA_LONGITUDE, location.getLongitude());
-            intent.putExtra(EXTRA_ACCURACY, location.getAccuracy());
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
     }
 
     /**
@@ -126,6 +98,8 @@ public class ForegroundService extends Service {
                 // Save the location
                 Location location = locationResult.getLastLocation();
 
+                Log.i(LOG_FOREGROUND, "LOCATION :: " + location.getLatitude() + " , " + location.getLongitude());
+
                 // Update SharedPreference data
                 spUpdateLocationController.updateLatLong(
                         String.valueOf(location.getLatitude()),
@@ -142,6 +116,20 @@ public class ForegroundService extends Service {
         }
     }
 
+    /**
+     * Send Location information as Broadcast message to MainActivity
+     * @param location
+     */
+    private void sendBroadcastMessage(Location location) {
+        if (location != null) {
+            Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
+            intent.putExtra(EXTRA_LATITUDE, String.valueOf(location.getLatitude()));
+            intent.putExtra(EXTRA_LONGITUDE, String.valueOf(location.getLongitude()));
+            intent.putExtra(EXTRA_ACCURACY, String.valueOf(location.getAccuracy()));
+//            intent.putExtra(EXTRA_ADDRESS, getApproxAddress(location));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+    }
     /**
      * Register notification for the Foreground service
      */
@@ -165,13 +153,15 @@ public class ForegroundService extends Service {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-//    private void getApproxAddress(Location location) {
-//        Geocoder geocoder = new Geocoder(MainActivity.this);
+//    private String getApproxAddress(Location location) {
+//        Geocoder geocoder = new Geocoder(context);
+//        String address = "";
 //        try{
 //            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-//            textViewApproxAddress.setText(addresses.get(0).getAddressLine(0));
+//            address = addresses.get(0).getAddressLine(0);
 //        } catch (Exception e) {
-//            textViewApproxAddress.setText("-error-");
+//            address = "-error-";
 //        }
+//        return address;
 //    }
 }

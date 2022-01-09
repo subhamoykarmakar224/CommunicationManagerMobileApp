@@ -1,12 +1,5 @@
 package com.subhamoykarmakar.dm.v2;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import android.Manifest;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -16,26 +9,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.subhamoykarmakar.dm.v2.services.ForegroundService;
 import com.subhamoykarmakar.dm.v2.sp.SPUpdateLocationController;
 import com.subhamoykarmakar.dm.v2.utils.Constants;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
-
-
     private static String LOG_MAINACTIVITY = "LOG::MainActivity";
     private static int REQUEST_CODE = 11023;
 
@@ -59,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
 
         initWidgets();
 
+        // Foreground Service Broadcast Init
+        foregroundServiceBroadcastInit();
+
         bluetoothModulesBroadcastRecevierInit();
+
+        if(isMyServiceRunning(ForegroundService.class)) {
+            btnStartStop.setText("stop");
+        }
 
     } // End of onCreate method
 
@@ -72,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
         textViewApproxAddress = findViewById(R.id.textViewApproxAddress);
 
         spUpdateLocationController = new SPUpdateLocationController(this);
-
-        // Foreground Service Broadcast Init
-        foregroundServiceBroadcastInit();
 
         // Switch Listener
         // TODO :: Add location request priority control to Foreground service
@@ -107,13 +101,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void foregroundServiceBroadcastInit() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
                 new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         String lat = intent.getStringExtra(ForegroundService.EXTRA_LATITUDE);
                         String lng = intent.getStringExtra(ForegroundService.EXTRA_LONGITUDE);
                         String accuracy = intent.getStringExtra(ForegroundService.EXTRA_ACCURACY);
+
                         updateUIValues(lat, lng, accuracy);
                     }
                 }, new IntentFilter(ForegroundService.ACTION_LOCATION_BROADCAST)
@@ -140,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
 
     /**
      * BLUETOOTH MODULE
@@ -228,13 +221,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        stopUpdate();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopUpdate();
         unregisterReceiver(mBroadcaseReceiver2Discoverability);
     }
 }
