@@ -35,4 +35,8 @@ public class Constants {
     public static final String KEY_SP_LATITUDE = "latitude";
     public static final String KEY_SP_LONGITUDE = "longitude";
 
+    // LOCATION
+    public static final int DEFAULT_UPDATE_INTERVAL = 5;
+    public static final int FAST_UPDATE_INTERVAL = 1;
+
 }
