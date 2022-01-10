@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         initWidgets();
 
+        checkRuntimePermissions();
+
         // Foreground Service Broadcast Init
         foregroundServiceBroadcastInit();
 

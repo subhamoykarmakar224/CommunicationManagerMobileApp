@@ -28,12 +28,14 @@ public class Constants {
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE
     };
 
     // Shared Preference Keys
     public static final String KEY_SP_LATITUDE = "latitude";
     public static final String KEY_SP_LONGITUDE = "longitude";
+    public static final String KEY_SP_DEVICE_ID = "device_id";
 
     // LOCATION
     public static final int DEFAULT_UPDATE_INTERVAL = 5;

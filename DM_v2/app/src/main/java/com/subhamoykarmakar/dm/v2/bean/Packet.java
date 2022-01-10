@@ -18,8 +18,7 @@ public class Packet {
     private int msgSemantics;
     private int metaSeqNumber;
 
-    public Packet(int pktId, String sensorId, String rssi, String nativeMAC, String longitude, String latitude, String id, String advRecord, String name, String type, String timestamp, String first_packet, String commitStatus, int orderedDeliveryStatus, int msgSemantics, int metaSeqNumber) {
-        this.pktId = pktId;
+    public Packet(String sensorId, String rssi, String nativeMAC, String longitude, String latitude, String id, String advRecord, String name, String type, String timestamp, String first_packet, String commitStatus, int orderedDeliveryStatus, int msgSemantics, int metaSeqNumber) {
         this.sensorId = sensorId;
         this.rssi = rssi;
         this.nativeMAC = nativeMAC;
